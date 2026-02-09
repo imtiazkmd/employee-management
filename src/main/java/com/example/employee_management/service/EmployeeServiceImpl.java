@@ -1,5 +1,6 @@
 package com.example.employee_management.service;
 
+import com.example.employee_management.dto.EmployeeNotificationMessage;
 import com.example.employee_management.dto.EmployeeRequest;
 import com.example.employee_management.dto.EmployeeResponse;
 import com.example.employee_management.entity.Department;
@@ -19,6 +20,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
+    private final NotificationPublisher notificationPublisher;
+
 
     @Override
     public EmployeeResponse create(EmployeeRequest request) {
@@ -33,8 +36,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .salary(request.salary())
                 .joiningDate(request.joiningDate())
                 .build();
+        EmployeeResponse savedEmployee = mapToResponse(employeeRepository.save(employee));
+        notificationPublisher.sendEmployeeCreated(
+                new EmployeeNotificationMessage(
+                        employee.getId(),
+                        employee.getFullName(),
+                        employee.getEmail(),
+                        department.getName()
+                )
+        );
+        return  savedEmployee;
 
-        return mapToResponse(employeeRepository.save(employee));
     }
 
     @Override

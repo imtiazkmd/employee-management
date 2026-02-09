@@ -1,5 +1,6 @@
 package com.example.employee_management.service;
 
+import com.example.employee_management.dto.LeaveNotificationMessage;
 import com.example.employee_management.dto.LeaveRequestCreateRequest;
 import com.example.employee_management.dto.LeaveResponse;
 import com.example.employee_management.entity.Employee;
@@ -19,6 +20,8 @@ public class LeaveServiceImpl implements LeaveService {
 
     private final LeaveRequestRepository leaveRequestRepository;
     private final EmployeeRepository employeeRepository;
+    private final NotificationPublisher notificationPublisher;
+
 
     @Override
     public LeaveResponse applyLeave(LeaveRequestCreateRequest request) {
@@ -34,7 +37,17 @@ public class LeaveServiceImpl implements LeaveService {
                 .status(LeaveStatus.PENDING)
                 .build();
 
-        return mapToResponse(leaveRequestRepository.save(leaveRequest));
+        LeaveResponse leaveResponse = mapToResponse(leaveRequestRepository.save(leaveRequest));
+        notificationPublisher.sendLeaveStatusUpdate(
+                new LeaveNotificationMessage(
+                        leaveRequest.getId(),
+                        leaveRequest.getEmployee().getFullName(),
+                        leaveRequest.getStartDate(),
+                        leaveRequest.getEndDate(),
+                        leaveResponse.status()
+                )
+        );
+        return leaveResponse;
     }
 
     @Override
