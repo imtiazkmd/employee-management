@@ -2,11 +2,15 @@ package com.example.employee_management.controller;
 
 import com.example.employee_management.dto.EmployeeRequest;
 import com.example.employee_management.dto.EmployeeResponse;
+import com.example.employee_management.entity.Employee;
+import com.example.employee_management.repo.EmployeeRepository;
 import com.example.employee_management.service.EmployeeService;
+import com.example.employee_management.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final EmployeeRepository employeeRepository;
 
     /**
      * GET /api/employees
@@ -40,6 +45,24 @@ public class EmployeeController {
     public EmployeeResponse getEmployee(@PathVariable Long id) {
         return employeeService.getById(id);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public Employee getEmployeeById(Long id) {
+
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        if (SecurityUtil.getCurrentUsername().equals("admin")) {
+            return employee;
+        }
+
+        if (!employee.getEmail().equals(SecurityUtil.getCurrentUsername())) {
+            throw new AccessDeniedException("You can access only your own employee data");
+        }
+
+        return employee;
+    }
+
 
     /**
      * POST /api/employees
