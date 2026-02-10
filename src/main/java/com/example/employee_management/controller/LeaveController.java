@@ -8,6 +8,7 @@ import com.example.employee_management.service.LeaveService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class LeaveController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('USER')")
     public LeaveResponse applyLeave(
             @Valid @RequestBody LeaveRequestCreateRequest request
     ) {
@@ -28,6 +30,7 @@ public class LeaveController {
     }
 
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public LeaveResponse updateLeaveStatus(
             @PathVariable Long id,
             @Valid @RequestBody LeaveStatusUpdateRequest request
@@ -36,6 +39,7 @@ public class LeaveController {
     }
 
     @GetMapping("/employee/{empId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public List<LeaveResponse> getEmployeeLeaves(@PathVariable Long empId) {
         return leaveService.getEmployeeLeaves(empId);
     }

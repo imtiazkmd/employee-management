@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class EmployeeController {
      * Supports pagination, sorting, filtering
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public Page<EmployeeResponse> getEmployees(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "fullName") String sortBy,
@@ -34,6 +36,7 @@ public class EmployeeController {
      * GET /api/employees/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public EmployeeResponse getEmployee(@PathVariable Long id) {
         return employeeService.getById(id);
     }
@@ -43,6 +46,7 @@ public class EmployeeController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public EmployeeResponse createEmployee(
             @Valid @RequestBody EmployeeRequest request
     ) {
@@ -53,6 +57,7 @@ public class EmployeeController {
      * PUT /api/employees/{id}
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public EmployeeResponse updateEmployee(
             @PathVariable Long id,
             @Valid @RequestBody EmployeeRequest request
@@ -65,6 +70,7 @@ public class EmployeeController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteEmployee(@PathVariable Long id) {
         employeeService.delete(id);
     }
