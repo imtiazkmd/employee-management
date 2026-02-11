@@ -4,6 +4,7 @@ import com.example.employee_management.dto.DepartmentRequest;
 import com.example.employee_management.dto.DepartmentResponse;
 import com.example.employee_management.dto.EmployeeResponse;
 import com.example.employee_management.entity.Department;
+import com.example.employee_management.exception.ResourceAlreadyExistsException;
 import com.example.employee_management.exception.ResourceNotFoundException;
 import com.example.employee_management.repo.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentResponse create(DepartmentRequest request) {
+
+        if (departmentRepository.existsByNameIgnoreCase(request.name())) {
+            throw new ResourceAlreadyExistsException(
+                    "Department already exists with name: " + request.name()
+            );
+        }
 
         Department department = Department.builder()
                 .name(request.name())
