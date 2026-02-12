@@ -11,6 +11,25 @@ Spring Boot application for managing employees, departments, leave requests, and
 - RabbitMQ
 - Docker & Docker Compose
 
+## Setup Instructions
+
+### Prerequisites
+- Java 17
+- Maven 3.9+
+- MySQL 8+
+- Docker (optional)
+
+### Run locally
+mvn clean install
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+
+### Run with Docker
+docker-compose up --build
+
+## PostMan Collection
+-https://lunar-robot-71097.postman.co/workspace/My-Workspace~4c2f95c6-2177-472d-8f32-67228e6adbbb/collection/20256648-30524ac2-fe56-485c-8faa-6bb280923af1?action=share&creator=20256648
+-https://lunar-robot-71097.postman.co/workspace/My-Workspace~4c2f95c6-2177-472d-8f32-67228e6adbbb/collection/20256648-704bb102-69e6-48a5-9e39-751cf75056b7?action=share&creator=20256648
+
 ## Architecture Overview
 - RESTful layered architecture
 - Service-level authorization
